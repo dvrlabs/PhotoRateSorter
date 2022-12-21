@@ -1,7 +1,10 @@
-import os, sys, shutil, glob
+import os
+import sys
+import shutil
+import glob
 from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 
 
@@ -19,27 +22,26 @@ class PhotoRateSorter(QMainWindow):
 
         # Create a label to hold the pixmap image
         self.photoLabel = QtWidgets.QLabel(self)
-        self.photoLabel.setGeometry(100,100,self.width(),self.height())
+        self.photoLabel.setGeometry(100, 100, self.width(), self.height())
 
         # Define, create menubar actions
-        self.addMenuAction("exit.png", 
-                            "&Exit", 
-                            "Ctrl+Q",
-                            "Exit the program.",
-                            qApp.quit)
+        self.addMenuAction("exit.png",
+                           "&Exit",
+                           "Ctrl+Q",
+                           "Exit the program.",
+                           qApp.quit)
 
-        self.addMenuAction("folder.png", 
-                            "&Load", 
-                            "Ctrl+L",
-                            "Load the photo of folders",
-                            self.loadFolderPhotos)
+        self.addMenuAction("folder.png",
+                           "&Load",
+                           "Ctrl+L",
+                           "Load the photo of folders",
+                           self.loadFolderPhotos)
 
-
-        self.addMenuAction("output.png", 
-                            "&Output", 
-                            "Ctrl+O",
-                            "Select the output folder",
-                            self.loadOutputFolder)
+        self.addMenuAction("output.png",
+                           "&Output",
+                           "Ctrl+O",
+                           "Select the output folder",
+                           self.loadOutputFolder)
 
         # Create back and forth buttons to browser the list of photos loaded.
         self.LeftPicScroll = QtWidgets.QPushButton(self)
@@ -56,10 +58,10 @@ class PhotoRateSorter(QMainWindow):
 
         # Create a label to tell which photo out of X/MAX that the user is at
         self.locIndicator = QtWidgets.QLabel(self)
-        self.locIndicator.setGeometry(1700, 25, 75, 75) 
+        self.locIndicator.setGeometry(1700, 25, 75, 75)
         self.locIndicator.setText("000/000")
 
-        #Create the 5 buttons for rating 1 - 5, 1 bad, 5 great
+        # Create the 5 buttons for rating 1 - 5, 1 bad, 5 great
         self.oneButton = QtWidgets.QPushButton(self)
         self.oneButton.setGeometry(1700, 175, 75, 75)
         self.oneButton.setText("1")
@@ -90,35 +92,35 @@ class PhotoRateSorter(QMainWindow):
         self.fiveButton.setShortcut("5")
         self.fiveButton.clicked.connect(lambda: self.ratePhoto(5))
 
-
     def addMenuAction(self, icon, name, shortcut, status, function):
-            actName = f"{name[1:]}Action"
-            setattr(self, actName, QAction(QIcon(icon), name, self))
-            action = getattr(self, actName)
-            action.setShortcut(shortcut)
-            action.setStatusTip(status)
-            action.triggered.connect(function)
-            self.fileMenu.addAction(action)
+        actName = f"{name[1:]}Action"
+        setattr(self, actName, QAction(QIcon(icon), name, self))
+        action = getattr(self, actName)
+        action.setShortcut(shortcut)
+        action.setStatusTip(status)
+        action.triggered.connect(function)
+        self.fileMenu.addAction(action)
 
     def loadFolderPhotos(self):
-        folderpath = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder of photos.')
+        folderpath = QtWidgets.QFileDialog.getExistingDirectory(
+            self, 'Select Folder of photos.')
         self.setStatusTip(f"Selected photo folder: {folderpath}")
-        self.photos = glob.glob(f"{folderpath}\*") 
-        self.photos = [photo for photo in self.photos if not "MOV" in photo] 
-
+        self.photos = glob.glob(f"{folderpath}/*")
+        self.photos = [photo for photo in self.photos if "MOV" not in photo]
 
         self.currentListIndex = 0
 
-        I =  QPixmap(self.photos[self.currentListIndex])
+        Image = QPixmap(self.photos[self.currentListIndex])
         scaledWidth = int(self.width()/1.25)
         scaledHeight = int(self.height()/1.25)
-        I = I.scaled(scaledWidth, scaledHeight, Qt.KeepAspectRatio, Qt.FastTransformation)
-        self.photoLabel.setPixmap(I)
+        Image = Image.scaled(scaledWidth, scaledHeight,
+                             Qt.KeepAspectRatio, Qt.FastTransformation)
+        self.photoLabel.setPixmap(Image)
         self.photoLabel.resize(scaledWidth, scaledHeight)
 
-
     def loadOutputFolder(self):
-        folderpath = QtWidgets.QFileDialog.getExistingDirectory(self, 'Select Folder of OUTPUT')
+        folderpath = QtWidgets.QFileDialog.getExistingDirectory(
+            self, 'Select Folder of OUTPUT')
         directory = "OUTPUT"
 
         path = os.path.join(folderpath, directory)
@@ -135,7 +137,7 @@ class PhotoRateSorter(QMainWindow):
         path3 = os.path.join(path, "3")
         os.mkdir(path3)
         self.path3 = path3
-        
+
         path4 = os.path.join(path, "4")
         os.mkdir(path4)
         self.path4 = path4
@@ -150,46 +152,52 @@ class PhotoRateSorter(QMainWindow):
         if self.currentListIndex == 0:
             self.currentListIndex = len(self.photos) - 1
         else:
-            self.currentListIndex -= 1 
+            self.currentListIndex -= 1
 
-        I =  QPixmap(self.photos[self.currentListIndex])
+        Image = QPixmap(self.photos[self.currentListIndex])
         scaledWidth = int(self.width()/1.25)
         scaledHeight = int(self.height()/1.25)
-        I = I.scaled(scaledWidth, scaledHeight, Qt.KeepAspectRatio, Qt.FastTransformation)
-        self.photoLabel.setPixmap(I)
+        Image = Image.scaled(scaledWidth, scaledHeight,
+                             Qt.KeepAspectRatio, Qt.FastTransformation)
+        self.photoLabel.setPixmap(Image)
         self.photoLabel.resize(scaledWidth, scaledHeight)
 
-        self.locIndicator.setText(f"{self.currentListIndex+1}/{len(self.photos) - 1}")
-
+        self.locIndicator.setText(
+            f"{self.currentListIndex+1}/{len(self.photos) - 1}")
 
     def scrollRight(self):
         if self.currentListIndex == len(self.photos) - 1:
             self.currentListIndex = 0
         else:
-            self.currentListIndex += 1 
+            self.currentListIndex += 1
 
-        I =  QPixmap(self.photos[self.currentListIndex])
+        Image = QPixmap(self.photos[self.currentListIndex])
         scaledWidth = int(self.width()/1.25)
         scaledHeight = int(self.height()/1.25)
-        I = I.scaled(scaledWidth, scaledHeight, Qt.KeepAspectRatio, Qt.FastTransformation)
-        self.photoLabel.setPixmap(I)
+        Image = Image.scaled(scaledWidth, scaledHeight,
+                             Qt.KeepAspectRatio, Qt.FastTransformation)
+        self.photoLabel.setPixmap(Image)
         self.photoLabel.resize(scaledWidth, scaledHeight)
 
-        self.locIndicator.setText(f"{self.currentListIndex+1}/{len(self.photos) - 1}")
-
+        self.locIndicator.setText(
+            f"{self.currentListIndex+1}/{len(self.photos) - 1}")
 
     def ratePhoto(self, rating):
-        if rating == 1: cpath = self.path1
-        if rating == 2: cpath = self.path2
-        if rating == 3: cpath = self.path3
-        if rating == 4: cpath = self.path4
-        if rating == 5: cpath = self.path5
+        cpath = ""
+        if rating == 1:
+            cpath = self.path1
+        if rating == 2:
+            cpath = self.path2
+        if rating == 3:
+            cpath = self.path3
+        if rating == 4:
+            cpath = self.path4
+        if rating == 5:
+            cpath = self.path5
 
         shutil.copy(self.photos[self.currentListIndex], cpath)
         self.photos.pop(self.currentListIndex)
         self.scrollRight()
-
-
 
 
 def main():
